@@ -1,0 +1,7 @@
+{
+  "name": "HabitFlow",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
