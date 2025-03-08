@@ -1,22 +1,15 @@
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import ExploreContainer from '../components/ExploreContainer';
+import React from 'react';
+import { IonPage, IonContent } from '@ionic/react';
 import './Home.css';
 
 const Home: React.FC = () => {
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>Blank</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Blank</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <ExploreContainer />
+      <IonContent className="home-container">
+        <h1 className="title">HabitFlow</h1>
+        <img src="/Healthy lifestyle-bro.svg" alt="HabitFlow Illustration" className="illustration" />
+        <button className="login-button">INICIAR SESIÓN</button>
+        <div className="wave" />
       </IonContent>
     </IonPage>
   );
