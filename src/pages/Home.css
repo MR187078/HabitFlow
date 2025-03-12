@@ -62,9 +62,10 @@
     bottom: 0;
     width: 100%;
     height: auto;
+    z-index: -1;
 }
 
-.wave-svg {
+.wave-main-svg {
     width: 100%;
     display: block;
 }

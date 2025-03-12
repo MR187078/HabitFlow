@@ -74,10 +74,6 @@ const Register: React.FC = () => {
                         ¿Ya tienes una cuenta? <span className="register-link" onClick={() => history.replace('/login')}>Iniciar sesión</span>
                     </p>
                 </div>
-
-                <div className="wave-container-register">
-                    <img src="/wave.svg" alt="Wave Animation" className="wave-svg" />
-                </div>
             </IonContent>
         </IonPage>
     );

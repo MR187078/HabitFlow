@@ -1,14 +1,13 @@
 import { auth, db } from "./firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+export { auth };
 
-// REGISTRAR USUARIO Y GUARDAR EN FIRESTORE
 export const registerUser = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Guardar info en Firestore
         await setDoc(doc(db, "users", user.uid), {
             firstName,
             lastName,
@@ -23,7 +22,6 @@ export const registerUser = async (email: string, password: string, firstName: s
     }
 };
 
-// INICIAR SESIÓN
 export const loginUser = async (email: string, password: string) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);

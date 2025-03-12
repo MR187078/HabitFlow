@@ -16,13 +16,13 @@ const Home: React.FC = () => {
         <div className="content-wrapper">
           <h1 className="title">HabitFlow</h1>
           <img src="/Healthy lifestyle-bro.svg" alt="HabitFlow Illustration" className="illustration" />
-          
+
           <button className="login-button" onClick={goToLogin}>
             INICIAR SESIÓN
           </button>
-        </div>
-        <div className="wave-container">
-          <img src="/wave.svg" alt="Wave Animation" className="wave-svg" />
+          <div className="wave-container">
+            <img src="/wave-main.svg" alt="Wave Animation" className="wave-main-svg" />
+          </div>
         </div>
       </IonContent>
     </IonPage>
