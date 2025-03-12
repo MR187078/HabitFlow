@@ -3,7 +3,7 @@ import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import "./Dashboard.css";
 
 const Dashboard: React.FC = () => {
@@ -12,25 +12,37 @@ const Dashboard: React.FC = () => {
     const [habits, setHabits] = useState<{ title: string; icon: string }[]>([]);
     const [progress, setProgress] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                console.log("No hay usuario autenticado, redirigiendo al login...");
+                window.location.replace("/login");
+            } else {
+                setUserId(user.uid);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         const fetchUserData = async () => {
-            const user = auth.currentUser;
-            if (!user) return;
+            if (!userId) return;
 
             const userSnapshot = await getDocs(collection(db, "users"));
-            const userData = userSnapshot.docs.find(doc => doc.id === user.uid);
-            
+            const userData = userSnapshot.docs.find(doc => doc.id === userId);
+
             if (userData) {
                 setUserName(userData.data().firstName);
             }
         };
 
         const fetchUserHabits = async () => {
-            const user = auth.currentUser;
-            if (!user) return;
+            if (!userId) return;
 
-            const userHabitsRef = collection(db, "users", user.uid, "habits");
+            const userHabitsRef = collection(db, "users", userId, "habits");
             const querySnapshot = await getDocs(userHabitsRef);
             const userHabits = querySnapshot.docs.map((doc) => doc.data() as { title: string; icon: string });
 
@@ -39,7 +51,7 @@ const Dashboard: React.FC = () => {
 
         fetchUserData();
         fetchUserHabits();
-    }, []);
+    }, [userId]);
 
     useEffect(() => {
         if (habits.length > 0) {
@@ -52,11 +64,16 @@ const Dashboard: React.FC = () => {
         try {
             await signOut(auth);
             console.log("Sesión cerrada correctamente");
-            history.replace("/login");
+            
+            setMenuOpen(false);
+            setTimeout(() => {
+                window.location.href = "/home";
+            }, 500);
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }
     };
+    
 
     return (
         <IonPage>

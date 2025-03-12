@@ -50,16 +50,16 @@ const AddHabit: React.FC = () => {
 
     const applyHabit = async () => {
         if (!habitTitle.trim() || !selectedIcon || !user) return;
-
+    
         try {
             const userHabitsRef = collection(db, "users", user.uid, "habits");
-
+    
             if (editingHabitId) {
                 await updateDoc(doc(userHabitsRef, editingHabitId), {
                     title: habitTitle,
                     icon: selectedIcon
                 });
-
+    
                 setHabits(habits.map(habit =>
                     habit.id === editingHabitId ? { ...habit, title: habitTitle, icon: selectedIcon } : habit
                 ));
@@ -68,7 +68,7 @@ const AddHabit: React.FC = () => {
                     title: habitTitle,
                     icon: selectedIcon
                 });
-
+    
                 setHabits([...habits, { id: docRef.id, title: habitTitle, icon: selectedIcon }]);
             }
 
@@ -76,10 +76,11 @@ const AddHabit: React.FC = () => {
             setSelectedIcon(habitIcons[0]);
             setEditingHabitId(null);
             setIsModalOpen(false);
+    
         } catch (error) {
             console.error("Error al guardar hábito:", error);
         }
-    };
+    };    
 
     const deleteHabit = async (id: string) => {
         try {
@@ -109,7 +110,7 @@ const AddHabit: React.FC = () => {
         try {
             await signOut(auth);
             console.log("Sesión cerrada correctamente");
-            history.replace("/login");
+            history.replace("/home");
         } catch (error) {
             console.error("Error al cerrar sesión:", error);
         }
@@ -136,11 +137,11 @@ const AddHabit: React.FC = () => {
                     <img src="/dragon.svg" alt="Logo" className="dragon-logo" />
                 </div>
 
-                <h2 className="title">Añadir Hábito</h2>
+                <h2 className="title-añadir">Añadir Hábito</h2>
 
                 <div className="habit-list-container">
                     {habits.length === 0 ? (
-                        <p className="info-text">No tienes hábitos agregados aún.</p>
+                        <p className="info-text-añadir">No tienes hábitos agregados aún.</p>
                     ) : (
                         habits.map((habit) => (
                             <div key={habit.id} className="habit-item">
@@ -160,9 +161,9 @@ const AddHabit: React.FC = () => {
                 </button>
 
                 {isModalOpen && (
-                    <div className="modal-overlay">
-                        <div className="modal-content">
-                            <button className="close-modal" onClick={() => setIsModalOpen(false)}>✖</button>
+                    <div className="modal-overlay-habit">
+                        <div className="modal-content-habit">
+                            <button className="close-modal-habit" onClick={() => setIsModalOpen(false)}>✖</button>
                             <h3 className="subtitle">{editingHabitId ? "Editar Hábito" : "Añadir Hábito"}</h3>
                             <input
                                 type="text"

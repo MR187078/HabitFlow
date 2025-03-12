@@ -1,193 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { IonPage, IonContent, IonModal } from "@ionic/react";
-import { useHistory } from "react-router-dom";
-import { auth, db } from "../firebaseConfig";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import "./AddHabit.css";
+import React, { useState, useEffect } from 'react';
+import { IonPage, IonContent } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
+import { auth, loginUser } from '../authService'; 
+import { onAuthStateChanged } from 'firebase/auth';
+import './Login.css';
 
-const habitIcons = [
-    "dumbbell.svg",
-    "early-awakening.svg",
-    "early-sleep.svg",
-    "fluent_food-16-filled.svg",
-    "read-book.svg",
-    "study.svg"
-];
-
-interface Habit {
-    id: string;
-    title: string;
-    icon: string;
-}
-
-const AddHabit: React.FC = () => {
-    const [habitTitle, setHabitTitle] = useState("");
-    const [selectedIcon, setSelectedIcon] = useState<string>(habitIcons[0]);
-    const [habits, setHabits] = useState<Habit[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
+const Login: React.FC = () => {
     const history = useHistory();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [, setCurrentUser] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchHabits = async () => {
-            const user = auth.currentUser;
-            if (!user) {
-                console.warn("Usuario no autenticado, no se pueden cargar hábitos.");
-                return;
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Usuario autenticado en sesión:", user.email);
+                setCurrentUser(user.email);
+            } else {
+                console.log("No hay usuario autenticado.");
+                setCurrentUser(null);
             }
+        });
 
-            const userHabitsRef = collection(db, "users", user.uid, "habits");
-            const querySnapshot = await getDocs(userHabitsRef);
-
-            const loadedHabits = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Habit[];
-
-            setHabits(loadedHabits);
-        };
-
-        fetchHabits();
+        return () => unsubscribe();
     }, []);
 
-    const applyHabit = async () => {
-        const user = auth.currentUser;
-        if (!user) {
-            console.error("Usuario no autenticado, no se puede guardar el hábito.");
-            alert("Debes iniciar sesión para guardar hábitos.");
-            return;
-        }
-
-        if (!habitTitle.trim() || !selectedIcon) return;
-
+    const handleLogin = async () => {
         try {
-            const userHabitsRef = collection(db, "users", user.uid, "habits"); 
+            await loginUser(email, password);
+            console.log("Iniciando sesión con:", email);
 
-            if (editingHabitId) {
-                await updateDoc(doc(userHabitsRef, editingHabitId), {
-                    title: habitTitle,
-                    icon: selectedIcon
-                });
-
-                setHabits(habits.map(habit =>
-                    habit.id === editingHabitId ? { ...habit, title: habitTitle, icon: selectedIcon } : habit
-                ));
-            } else {
-                const docRef = await addDoc(userHabitsRef, {
-                    title: habitTitle,
-                    icon: selectedIcon,
-                    userId: user.uid
-                });
-
-                setHabits([...habits, { id: docRef.id, title: habitTitle, icon: selectedIcon }]);
-            }
-
-            setHabitTitle("");
-            setSelectedIcon(habitIcons[0]);
-            setEditingHabitId(null);
-            setIsModalOpen(false);
+            setTimeout(() => {
+                const user = auth.currentUser;
+                if (user) {
+                    console.log("Usuario verificado tras login:", user.email);
+                    alert(`Inicio de sesión exitoso. Bienvenido, ${user.email}`);
+                    history.replace('/dashboard');
+                } else {
+                    alert("Error verificando el usuario autenticado.");
+                }
+            }, 1000);
         } catch (error) {
-            console.error("Error al guardar hábito:", error);
-            alert("Error al guardar hábito en Firestore.");
+            const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+            console.error("Error al iniciar sesión:", errorMessage);
+            alert("Error al iniciar sesión: " + errorMessage);
         }
     };
 
-    const deleteHabit = async (id: string) => {
-        const user = auth.currentUser;
-        if (!user) {
-            console.warn("Usuario no autenticado, no se puede eliminar hábito.");
-            return;
-        }
-
-        try {
-            await deleteDoc(doc(db, "users", user.uid, "habits", id));
-            setHabits(habits.filter(habit => habit.id !== id));
-            console.log(`Hábito con ID ${id} eliminado`);
-        } catch (error) {
-            console.error("Error al eliminar hábito:", error);
-        }
-    };
-
-    const editHabit = (habit: Habit) => {
-        setHabitTitle(habit.title);
-        setSelectedIcon(habit.icon);
-        setEditingHabitId(habit.id);
-        setIsModalOpen(true);
-    };
-
-    const goToDashboard = () => {
-        history.replace("/dashboard");
+    const goToRegister = () => {
+        history.replace('/register');
     };
 
     return (
         <IonPage>
-            <IonContent className="add-habit-container" fullscreen>
-                <div className="navbar">
-                    <img src="/menu-black.svg" alt="Menú" className="menu-icon" />
-                    <img src="/dragon.svg" alt="Logo" className="dragon-logo" />
-                </div>
-                <h2 className="title">Añadir Hábito</h2>
+            <IonContent className="login-container" fullscreen scrollY={false} style={{ "--background": "transparent" }}>
+                <div className="login-background">
+                    <h2 className="login-title">INICIO DE SESIÓN</h2>
 
-                <div className="habit-list-container">
-                    {habits.length === 0 ? (
-                        <p className="info-text">No tienes hábitos agregados aún.</p>
-                    ) : (
-                        habits.map((habit) => (
-                            <div key={habit.id} className="habit-item">
-                                <img src={`/habits/${habit.icon}`} alt={habit.title} className="habit-item-icon" />
-                                <span className="habit-title">{habit.title}</span>
-                                <div className="habit-actions">
-                                    <img src="/edit.svg" alt="Edit" className="action-icon" onClick={() => editHabit(habit)} />
-                                    <img src="/erase.svg" alt="Delete" className="action-icon" onClick={() => deleteHabit(habit.id)} />
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-
-                <button className="add-button" onClick={() => { setIsModalOpen(true); setEditingHabitId(null); }}>
-                    Añadir Hábito
-                </button>
-
-                <IonModal isOpen={isModalOpen} onDidDismiss={() => setIsModalOpen(false)}>
-                    <div className="modal-content">
-                        <h3 className="subtitle">{editingHabitId ? "Editar Hábito" : "Añadir Hábito"}</h3>
+                    <div className="input-group">
                         <input
-                            type="text"
-                            className="habit-input"
-                            placeholder="Escribe tu hábito..."
-                            value={habitTitle}
-                            onChange={(e) => setHabitTitle(e.target.value)}
+                            type="email"
+                            className="input-field"
+                            placeholder="Correo"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
-                        <div className="icon-scroll-container">
-                            <div className="icon-grid">
-                                {habitIcons.map((icon, index) => (
-                                    <div
-                                        key={index}
-                                        className={`habit-icon ${selectedIcon === icon ? "selected" : ""}`}
-                                        onClick={() => setSelectedIcon(icon)}
-                                    >
-                                        <img src={`/habits/${icon}`} alt={icon.replace(".svg", "")} />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        <button className="apply-button" onClick={applyHabit}>
-                            {editingHabitId ? "Actualizar" : "Aplicar"}
+                    </div>
+
+                    <div className="input-group password-container">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            className="input-field password-input"
+                            placeholder="Contraseña"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                            type="button"
+                            className="toggle-password"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            <img
+                                src={showPassword ? "/eye-lock-login.svg" : "/eye-login.svg"}
+                                alt="Mostrar Contraseña"
+                                className="password-icon"
+                            />
                         </button>
                     </div>
-                </IonModal>
 
-                <button className="finalize-button" onClick={goToDashboard}>
-                    Finalizar
-                </button>
+                    <div className="button-div">
+                        <button className="login-button" onClick={handleLogin}>
+                            INICIAR SESIÓN
+                        </button>
+                    </div>
 
-                <div className="wave-container">
-                    <img src="/wave-main.svg" alt="Wave Animation" className="wave-main-svg" />
+                    
+
+                    <p className="register-text">
+                        ¿No tienes una cuenta? <span className="register-link" onClick={goToRegister}>Regístrate aquí</span>
+                    </p>
                 </div>
             </IonContent>
         </IonPage>
     );
 };
 
-export default AddHabit;
+export default Login;

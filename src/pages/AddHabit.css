@@ -31,9 +31,10 @@
     background-color: #444;
 }
 
-.title {
+.title-añadir {
     font-size: 24px;
     font-weight: bold;
+    margin-top: 120px;
     margin-bottom: 10px;
     font-family: 'Lato', sans-serif;
 }
@@ -63,11 +64,20 @@
 
 .habit-list-container {
     width: 90%;
-    max-height: 350px;
+    max-height: 280px;
     overflow-y: auto;
     margin-bottom: 30px;
     border: none;
     padding: 10px;
+}
+
+.info-text-añadir {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 30px;
+    text-align: center;
+    max-width: 300px;
+    font-family: 'Lato', sans-serif;
 }
 
 .habit-item {
@@ -81,11 +91,12 @@
     border-radius: 8px;
     margin-bottom: 10px;
     font-family: 'Lato', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .habit-title {
-    font-size: 18px;
+    font-size: 16px;
+    font-family: 'Lato', sans-serif;
 }
 
 .habit-item-icon {
@@ -164,6 +175,8 @@
     margin-bottom: 20px;
     font-family: 'Lato', sans-serif;
     outline: none;
+    background-color: #ffffff;
+    color: #000;
 }
 
 .habit-input::placeholder {
@@ -195,7 +208,7 @@
     transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.modal-overlay {
+.modal-overlay-habit {
     position: fixed;
     top: 0;
     left: 0;
@@ -203,11 +216,12 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding-top: 20%;
 }
 
-.close-modal {
+.close-modal-habit {
     background: none;
     border: none;
     font-size: 24px;
@@ -218,12 +232,12 @@
     color: #333;
 }
 
-.modal-content {
+.modal-content-habit {
     background: white;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
-    width: 90%;
-    max-width: 400px;
+    width: 80%;
+    max-width: 350px;
     position: relative;
 }
