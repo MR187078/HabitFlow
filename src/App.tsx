@@ -9,6 +9,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AddHabit from "./pages/AddHabit";
+import HabitView from "./pages/HabitView";
+import Timer from "./pages/Timer";
 
 const App: React.FC = () => {
   const [, setUser] = useState<User | null>(null);
@@ -33,6 +35,8 @@ const App: React.FC = () => {
             <Route exact path="/register" component={Register} />
             <Route exact path="/dashboard" component={Dashboard} />
             <Route exact path="/addhabit" component={AddHabit} />
+            <Route exact path="/habitview/:id" component={HabitView} />
+            <Route exact path="/timer/:id" component={Timer} />
             <Route path="*">
               <Redirect to="/home" />
             </Route>

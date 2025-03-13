@@ -19,6 +19,7 @@ interface Habit {
     id: string;
     title: string;
     icon: string;
+    completed: boolean;
 }
 
 const AddHabit: React.FC = () => {
@@ -66,12 +67,13 @@ const AddHabit: React.FC = () => {
             } else {
                 const docRef = await addDoc(userHabitsRef, {
                     title: habitTitle,
-                    icon: selectedIcon
+                    icon: selectedIcon,
+                    completed: false
                 });
     
-                setHabits([...habits, { id: docRef.id, title: habitTitle, icon: selectedIcon }]);
+                setHabits([...habits, { id: docRef.id, title: habitTitle, icon: selectedIcon, completed: false }]);
             }
-
+    
             setHabitTitle("");
             setSelectedIcon(habitIcons[0]);
             setEditingHabitId(null);
@@ -81,6 +83,7 @@ const AddHabit: React.FC = () => {
             console.error("Error al guardar hábito:", error);
         }
     };    
+        
 
     const deleteHabit = async (id: string) => {
         try {

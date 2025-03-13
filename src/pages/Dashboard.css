@@ -81,7 +81,7 @@
 
 .progress-fill {
     fill: none;
-    stroke: #fff;
+    stroke: #c5c5c5;
     stroke-width: 15;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.5s ease;
@@ -136,17 +136,6 @@
     transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.wave-container {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: auto;
-}
-
-.wave-main-svg {
-    width: 100%;
-    display: block;
-}
 
 .habit-list-container-dashboard {
     width: 80%;

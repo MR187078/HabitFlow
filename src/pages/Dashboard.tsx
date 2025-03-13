@@ -6,10 +6,17 @@ import { collection, getDocs } from "firebase/firestore";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import "./Dashboard.css";
 
+interface Habit {
+    id: string;
+    title: string;
+    icon: string;
+    completed: boolean;
+}
+
 const Dashboard: React.FC = () => {
     const history = useHistory();
     const [userName, setUserName] = useState<string | null>(null);
-    const [habits, setHabits] = useState<{ title: string; icon: string }[]>([]);
+    const [habits, setHabits] = useState<Habit[]>([]);
     const [progress, setProgress] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
@@ -44,7 +51,10 @@ const Dashboard: React.FC = () => {
 
             const userHabitsRef = collection(db, "users", userId, "habits");
             const querySnapshot = await getDocs(userHabitsRef);
-            const userHabits = querySnapshot.docs.map((doc) => doc.data() as { title: string; icon: string });
+            const userHabits = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            })) as Habit[];
 
             setHabits(userHabits);
         };
@@ -55,7 +65,7 @@ const Dashboard: React.FC = () => {
 
     useEffect(() => {
         if (habits.length > 0) {
-            const completed = 0;
+            const completed = habits.filter(habit => habit.completed).length;
             setProgress((completed / habits.length) * 100);
         }
     }, [habits]);
@@ -74,7 +84,6 @@ const Dashboard: React.FC = () => {
         }
     };
     
-
     return (
         <IonPage>
             {menuOpen && (
@@ -120,11 +129,15 @@ const Dashboard: React.FC = () => {
                         <p className="info-text">Aún no tienes hábitos programados. Agrega uno pulsando el botón inferior.</p>
                     ) : (
                         <>
-                            <p className="info-text">{`0 de ${habits.length} completados`}</p>
+                            <p className="info-text">{`${habits.filter(habit => habit.completed).length} de ${habits.length} completados`}</p>
 
                             <div className="habit-list-container-dashboard">
-                                {habits.map((habit, index) => (
-                                    <button className="habit-item-dashboard" key={index}>
+                                {habits.map((habit) => (
+                                    <button 
+                                        className="habit-item-dashboard" 
+                                        key={habit.id} 
+                                        onClick={() => history.replace(`/habitview/${habit.id}`)}
+                                    >
                                         <img src={`/habits/${habit.icon}`} alt={habit.title} className="habit-icon-dashboard" />
                                         <span className="habit-title">{habit.title}</span>
                                     </button>
