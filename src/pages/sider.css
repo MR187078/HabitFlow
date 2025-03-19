@@ -1,0 +1,112 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 250px;
+    height: 100%;
+    background: #282828;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    border-radius: 0 20px 20px 0; 
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-content {
+    padding: 20px;
+    text-align: center;
+    color: white; /* Texto blanco */
+}
+
+.sidebar-content .close-menu {
+    background: none;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    cursor: pointer;
+    color: white; /* Color blanco para el botón de cierre */
+}
+
+.sidebar-content .close-menu:hover {
+    color: red; /* Cambia a rojo al hacer hover */
+}
+
+/* Sección de usuario */
+.user-section {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+.user-section img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.user-section h3 {
+    margin: 10px 0 5px;
+    font-size: 18px;
+}
+
+.user-section p {
+    font-size: 14px;
+    color: #ccc;
+}
+
+/* Secciones del menú */
+.menu-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background: #333; /* Fondo gris al hacer hover */
+}
+
+.menu-item img {
+    width: 24px;
+    height: 24px;
+}
+
+.menu-item span {
+    font-size: 16px;
+}
+
+/* Botón de cerrar sesión */
+.logout-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px;
+    margin-top: 20px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+}
+
+.logout-button img {
+    width: 24px;
+    height: 24px;
+}
+
+.logout-button:hover {
+    background: #333; /* Fondo gris al hacer hover */
+}

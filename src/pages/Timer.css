@@ -1,0 +1,133 @@
+.content-wrapper-timer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    margin-top: 80px;
+}
+
+.egg-container-timer {
+    width: 90%;
+    max-width: 350px;
+    position: relative;
+    text-align: center;
+    margin-bottom: 0px;
+    margin-top:10px;
+}
+
+.egg-container-timer img {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.timer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    height: 100vh;
+    background-color: #ffffff;
+    padding: 20px;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Lato', sans-serif;
+}
+
+.timer-content {
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #282828;
+}
+
+.timer-message {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    color: #555;
+}
+
+.time-picker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.time-picker input {
+    width: 60px;
+    height: 40px;
+    font-size: 1.2rem;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin: 0 10px;
+    background-color: white;
+    color: #282828;
+    cursor: pointer;
+    outline: none;
+}
+
+
+.time-picker input[type="number"]::-webkit-inner-spin-button, 
+.time-picker input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.time-picker input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.time-picker span {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 5px;
+    color: #333;
+}
+
+.timer-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    position: absolute;
+    bottom: 100px;
+    width: 100%;
+}
+
+.timer-button {
+    width: 80px;
+    height: 60px;
+    border: 2px solid white;
+    background-color: #282828;
+    color: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.timer-button img {
+    width: 24px;
+    height: 24px;
+}
+
+.timer-button:hover {
+    background-color: #444;
+}
+
+.timer-button:focus {
+    outline: none;
+}

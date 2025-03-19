@@ -1,0 +1,243 @@
+.add-habit-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100vh;
+    background-color: #ffffff;
+    padding: 20px;
+}
+
+.add-button {
+    width: 60%;
+    background-color: #282828;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px;
+    margin-top: 20px;
+    border: none;
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.add-button:hover {
+    background-color: #444;
+}
+
+.title-añadir {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 120px;
+    margin-bottom: 10px;
+    font-family: 'Lato', sans-serif;
+}
+
+.subtitle {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    font-family: 'Lato', sans-serif;
+}
+
+.modal-content {
+    background-color: white;
+    border: 2px solid black;
+    padding: 20px;
+    text-align: center;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.icon-scroll-container {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.habit-list-container {
+    width: 90%;
+    max-height: 280px;
+    overflow-y: auto;
+    margin-bottom: 30px;
+    border: none;
+    padding: 10px;
+}
+
+.info-text-añadir {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 30px;
+    text-align: center;
+    max-width: 300px;
+    font-family: 'Lato', sans-serif;
+}
+
+.habit-item {
+    display: flex;
+    width: 80%;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #282828;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+}
+
+.habit-title {
+    font-size: 16px;
+    font-family: 'Lato', sans-serif;
+}
+
+.habit-item-icon {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.habit-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.apply-button {
+    width: 100%;
+    background-color: #282828;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px;
+    margin-top: 20px;
+    border: none;
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    justify-content: center;
+}
+
+.apply-button:hover {
+    background-color: #444;
+    transform: scale(0.95);
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.icon-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 10px;
+}
+
+.habit-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #282828;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.habit-icon img {
+    width: 30px;
+    height: 30px;
+}
+
+.habit-icon.selected {
+    border: 2px solid rgb(139, 139, 139);
+    transform: scale(1.1);
+}
+
+.habit-input {
+    width: 90%;
+    padding: 12px;
+    border: 2px solid #282828;
+    border-radius: 8px;
+    font-size: 18px;
+    margin-bottom: 20px;
+    font-family: 'Lato', sans-serif;
+    outline: none;
+    background-color: #ffffff;
+    color: #000;
+}
+
+.habit-input::placeholder {
+    color: #888;
+}
+
+.finalize-button {
+    width: 60%;
+    background-color: #282828;
+    color: white;
+    border-radius: 8px;
+    font-size: 16px;
+    padding: 12px;
+    border: none;
+    font-family: 'Lato', sans-serif;
+    position: fixed;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.finalize-button:hover {
+    background-color: #444;
+    transform: scale(0.95);
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay-habit {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 20%;
+}
+
+.close-modal-habit {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: #333;
+}
+
+.modal-content-habit {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 80%;
+    max-width: 350px;
+    position: relative;
+}
