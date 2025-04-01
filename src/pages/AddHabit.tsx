@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
+import Spinner from "../pages/Spinner"; // Importa el componente Spinner
 import "./AddHabit.css";
 
 const habitIcons = [
@@ -29,21 +30,31 @@ const AddHabit: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [loading, setLoading] = useState(true); // Estado para manejar la carga
     const history = useHistory();
     const user = auth.currentUser;
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            setLoading(false); // Si no hay usuario, no hay carga
+            return;
+        }
 
         const fetchHabits = async () => {
-            const userHabitsRef = collection(db, "users", user.uid, "habits");
-            const querySnapshot = await getDocs(userHabitsRef);
-            const loadedHabits = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Habit[];
+            try {
+                const userHabitsRef = collection(db, "users", user.uid, "habits");
+                const querySnapshot = await getDocs(userHabitsRef);
+                const loadedHabits = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Habit[];
 
-            setHabits(loadedHabits);
+                setHabits(loadedHabits);
+            } catch (error) {
+                console.error("Error al cargar hábitos:", error);
+            } finally {
+                setLoading(false); // Oculta el spinner cuando la carga termina
+            }
         };
 
         fetchHabits();
@@ -51,16 +62,16 @@ const AddHabit: React.FC = () => {
 
     const applyHabit = async () => {
         if (!habitTitle.trim() || !selectedIcon || !user) return;
-    
+
         try {
             const userHabitsRef = collection(db, "users", user.uid, "habits");
-    
+
             if (editingHabitId) {
                 await updateDoc(doc(userHabitsRef, editingHabitId), {
                     title: habitTitle,
                     icon: selectedIcon
                 });
-    
+
                 setHabits(habits.map(habit =>
                     habit.id === editingHabitId ? { ...habit, title: habitTitle, icon: selectedIcon } : habit
                 ));
@@ -70,20 +81,19 @@ const AddHabit: React.FC = () => {
                     icon: selectedIcon,
                     completed: false
                 });
-    
+
                 setHabits([...habits, { id: docRef.id, title: habitTitle, icon: selectedIcon, completed: false }]);
             }
-    
+
             setHabitTitle("");
             setSelectedIcon(habitIcons[0]);
             setEditingHabitId(null);
             setIsModalOpen(false);
-    
+
         } catch (error) {
             console.error("Error al guardar hábito:", error);
         }
-    };    
-        
+    };
 
     const deleteHabit = async (id: string) => {
         try {
@@ -121,46 +131,19 @@ const AddHabit: React.FC = () => {
 
     return (
         <IonPage>
-             <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
-                <div className="sidebar-content">
-                    <button className="close-menu" onClick={() => setMenuOpen(false)}>✖</button>
-                    
-                    <div className="user-section">
+            {menuOpen && (
+                <div className="menu-overlay">
+                    <div className="menu-content">
+                        <button className="close-menu" onClick={() => setMenuOpen(false)}>✖</button>
                         <h3>Menú</h3>
+                        <button className="logout-button" onClick={logoutUser}>Cerrar Sesión</button>
                     </div>
-
-                    <div className="menu-sections">
-                        <div className="menu-item">
-                            <img src="/timer-icon.png" alt="Timer" className="menu-icon" />
-                            <span>Temporizador</span>
-                        </div>
-                        <div className="menu-item">
-                            <img src="/user-icon.png" alt="User" className="menu-icon" />
-                            <span>Usuario</span>
-                        </div>
-                        <div className="menu-item">
-                            <img src="/messages-icon.png" alt="Messages" className="menu-icon" />
-                            <span>Mensajes</span>
-                        </div>
-                        <div className="menu-item">
-                            <img src="/saved-icon.png" alt="Saved" className="menu-icon" />
-                            <span>Guardado</span>
-                        </div>
-                        <div className="menu-item">
-                            <img src="/settings-icon.png" alt="Settings" className="menu-icon" />
-                            <span>Configuracion</span>
-                        </div>
-                    </div>
-
-                    {/* Botón de cerrar sesión con ícono */}
-                    <button className="logout-button" onClick={logoutUser}>
-                        <img src="/logout-icon.png" alt="Cerrar Sesión" className="logout-icon" />
-                        <span>Cerrar Sesión</span>
-                    </button>
                 </div>
-            </div>    
-            
+            )}
+
             <IonContent className="add-habit-container" fullscreen>
+                {loading && <Spinner />} {/* Muestra el spinner mientras loading sea true */}
+
                 <div className="navbar">
                     <button className="menu-toggle" onClick={() => setMenuOpen(true)}>
                         <img src="/menu-black.svg" alt="Menú" />

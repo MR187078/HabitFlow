@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { signOut, onAuthStateChanged } from "firebase/auth";
+import Spinner from "../pages/Spinner"; // Importar el componente Spinner
 import "./Dashboard.css";
 
 interface Habit {
@@ -20,6 +21,7 @@ const Dashboard: React.FC = () => {
     const [progress, setProgress] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true); // Estado para controlar el spinner
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -35,43 +37,48 @@ const Dashboard: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchData = async () => {
             if (!userId) return;
 
-            // Obtener el documento del usuario desde Firestore
-            const userDocRef = doc(db, "users", userId);
-            const userDocSnap = await getDoc(userDocRef);
+            try {
+                setLoading(true); // Mostrar spinner al iniciar la carga
+                
+                // Obtener datos del usuario
+                const userDocRef = doc(db, "users", userId);
+                const userDocSnap = await getDoc(userDocRef);
 
-            if (userDocSnap.exists()) {
-                const userData = userDocSnap.data();
-                const fullName = `${userData.firstName} ${userData.lastName}`;
-                setUserName(fullName);  // Actualizar el estado con el nombre completo
-            } else {
-                console.log("No se encontró el documento del usuario.");
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    const fullName = `${userData.firstName} ${userData.lastName}`;
+                    setUserName(fullName);
+                } else {
+                    console.log("No se encontró el documento del usuario.");
+                }
+
+                // Obtener hábitos del usuario
+                const userHabitsRef = collection(db, "users", userId, "habits");
+                const querySnapshot = await getDocs(userHabitsRef);
+                const userHabits = querySnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data()
+                })) as Habit[];
+
+                setHabits(userHabits);
+
+                // Calcular progreso
+                const completedHabits = userHabits.filter(habit => habit.completed).length;
+                const totalHabits = userHabits.length;
+                const progress = totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0;
+                setProgress(progress);
+                
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+            } finally {
+                setLoading(false); // Ocultar spinner cuando termine la carga
             }
         };
 
-        const fetchUserHabits = async () => {
-            if (!userId) return;
-
-            const userHabitsRef = collection(db, "users", userId, "habits");
-            const querySnapshot = await getDocs(userHabitsRef);
-            const userHabits = querySnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Habit[];
-
-            setHabits(userHabits);
-
-            // Calcular el progreso
-            const completedHabits = userHabits.filter(habit => habit.completed).length;
-            const totalHabits = userHabits.length;
-            const progress = totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0;
-            setProgress(progress);
-        };
-
-        fetchUserData();
-        fetchUserHabits();
+        fetchData();
     }, [userId, history.location.state]);
 
     const logoutUser = async () => {
@@ -90,6 +97,8 @@ const Dashboard: React.FC = () => {
     
     return (
         <IonPage>
+            {loading && <Spinner />} {/* Mostrar spinner mientras loading sea true */}
+
             <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
                 <div className="sidebar-content">
                     <button className="close-menu" onClick={() => setMenuOpen(false)}>✖</button>
@@ -121,7 +130,6 @@ const Dashboard: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Botón de cerrar sesión con ícono */}
                     <button className="logout-button" onClick={logoutUser}>
                         <img src="/logout-icon.png" alt="Cerrar Sesión" className="logout-icon" />
                         <span>Cerrar Sesión</span>

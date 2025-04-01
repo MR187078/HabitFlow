@@ -4,6 +4,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
+import Spinner from "../pages/Spinner"; // Importar el componente Spinner
 import "./HabitView.css";
 
 interface Habit {
@@ -20,10 +21,13 @@ const HabitView: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [habit, setHabit] = useState<Habit | null>(null);
+    const [loading, setLoading] = useState(true); // Estado para controlar el spinner
+    const [actionLoading, setActionLoading] = useState(false); // Estado para acciones específicas
 
     const fetchHabit = useCallback(async (uid: string) => {
         if (!id) return;
         try {
+            setLoading(true); // Mostrar spinner al iniciar la carga
             const habitRef = doc(db, "users", uid, "habits", id);
             const habitSnap = await getDoc(habitRef);
             if (habitSnap.exists()) {
@@ -34,6 +38,8 @@ const HabitView: React.FC = () => {
             }
         } catch (error) {
             console.error("Error al obtener el hábito:", error);
+        } finally {
+            setLoading(false); // Ocultar spinner cuando termine la carga
         }
     }, [id]);
 
@@ -65,6 +71,7 @@ const HabitView: React.FC = () => {
         if (!userId || !id || !habit) return;
 
         try {
+            setActionLoading(true); // Mostrar spinner durante la acción
             console.log("Marcando hábito como completado y eliminándolo...");
 
             const habitRef = doc(db, "users", userId, "habits", id);
@@ -86,11 +93,15 @@ const HabitView: React.FC = () => {
             }
         } catch (error) {
             console.error("Error al marcar o eliminar el hábito:", error);
+        } finally {
+            setActionLoading(false); // Ocultar spinner cuando termine la acción
         }
     };
 
     return (
         <IonPage>
+            {(loading || actionLoading) && <Spinner />} {/* Mostrar spinner durante carga o acciones */}
+
             <div className={`sidebar ${menuOpen ? 'open' : ''}`}>
                 <div className="sidebar-content">
                     <button className="close-menu" onClick={() => setMenuOpen(false)}>✖</button>
@@ -122,7 +133,6 @@ const HabitView: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Botón de cerrar sesión con ícono */}
                     <button className="logout-button" onClick={logoutUser}>
                         <img src="/logout-icon.png" alt="Cerrar Sesión" className="logout-icon" />
                         <span>Cerrar Sesión</span>
@@ -145,17 +155,50 @@ const HabitView: React.FC = () => {
                         <span className="egg-animo">¡Ánimo! Tú puedes</span>
                     </div>
 
-                    <button className="start-button" onClick={() => setModalOpen(true)}>Comenzar</button>
-                    <a className="back-button" href="#" onClick={(e) => { e.preventDefault(); history.replace("/dashboard"); }}>Regresar</a>
+                    <button 
+                        className="start-button" 
+                        onClick={() => setModalOpen(true)}
+                        disabled={loading} // Deshabilitar botón durante carga
+                    >
+                        Comenzar
+                    </button>
+                    <a 
+                        className="back-button" 
+                        href="#" 
+                        onClick={(e) => { 
+                            e.preventDefault(); 
+                            if (!loading) history.replace("/dashboard"); 
+                        }}
+                    >
+                        Regresar
+                    </a>
                 </div>
 
                 {modalOpen && (
                     <div className="modal-overlay-habitview">
                         <div className="modal-content-habitview">
-                            <button className="close-modal-habitview" onClick={() => setModalOpen(false)}>✖</button>
+                            <button 
+                                className="close-modal-habitview" 
+                                onClick={() => setModalOpen(false)}
+                                disabled={actionLoading} // Deshabilitar durante acción
+                            >
+                                ✖
+                            </button>
                             <h3 className="subtitle">Realizar Hábito</h3>
-                            <button className="finish-button" onClick={markAsCompleted}>TERMINAR HÁBITO</button>
-                            <button className="finish-button" onClick={() => history.replace(`/timer/${id}`)}>TEMPORIZADOR</button>
+                            <button 
+                                className="finish-button" 
+                                onClick={markAsCompleted}
+                                disabled={actionLoading} // Deshabilitar durante acción
+                            >
+                                {actionLoading ? 'PROCESANDO...' : 'TERMINAR HÁBITO'}
+                            </button>
+                            <button 
+                                className="finish-button" 
+                                onClick={() => history.replace(`/timer/${id}`)}
+                                disabled={loading} // Deshabilitar durante carga
+                            >
+                                TEMPORIZADOR
+                            </button>
                         </div>
                     </div>
                 )}
