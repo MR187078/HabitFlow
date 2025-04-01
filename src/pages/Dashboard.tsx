@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { IonPage, IonContent } from "@ionic/react";
 import { useHistory } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import "./Dashboard.css";
 
@@ -15,7 +15,7 @@ interface Habit {
 
 const Dashboard: React.FC = () => {
     const history = useHistory();
-    const [userName, setUserName] = useState<string | null>(null);
+    const [userName, setUserName] = useState<string>("Usuario");
     const [habits, setHabits] = useState<Habit[]>([]);
     const [progress, setProgress] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -38,11 +38,16 @@ const Dashboard: React.FC = () => {
         const fetchUserData = async () => {
             if (!userId) return;
 
-            const userSnapshot = await getDocs(collection(db, "users"));
-            const userData = userSnapshot.docs.find(doc => doc.id === userId);
+            // Obtener el documento del usuario desde Firestore
+            const userDocRef = doc(db, "users", userId);
+            const userDocSnap = await getDoc(userDocRef);
 
-            if (userData) {
-                setUserName(userData.data().firstName);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                const fullName = `${userData.firstName} ${userData.lastName}`;
+                setUserName(fullName);  // Actualizar el estado con el nombre completo
+            } else {
+                console.log("No se encontró el documento del usuario.");
             }
         };
 
@@ -57,18 +62,17 @@ const Dashboard: React.FC = () => {
             })) as Habit[];
 
             setHabits(userHabits);
+
+            // Calcular el progreso
+            const completedHabits = userHabits.filter(habit => habit.completed).length;
+            const totalHabits = userHabits.length;
+            const progress = totalHabits > 0 ? (completedHabits / totalHabits) * 100 : 0;
+            setProgress(progress);
         };
 
         fetchUserData();
         fetchUserHabits();
-    }, [userId]);
-
-    useEffect(() => {
-        if (habits.length > 0) {
-            const completed = habits.filter(habit => habit.completed).length;
-            setProgress((completed / habits.length) * 100);
-        }
-    }, [habits]);
+    }, [userId, history.location.state]);
 
     const logoutUser = async () => {
         try {
@@ -135,7 +139,7 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="content-wrapper">
-                    <h2 className="welcome-text">Hola, {userName ? userName : "Usuario"}!</h2>
+                    <h2 className="welcome-text">Hola, {userName}!</h2>
                     <div className="progress-container">
                         <svg className="progress-circle" width="140" height="140" viewBox="0 0 140 140">
                             <circle className="progress-outer" cx="70" cy="70" r="65" />

@@ -3,7 +3,7 @@ import { IonPage, IonContent } from "@ionic/react";
 import { useHistory, useParams } from "react-router-dom";
 import { auth, db } from "../firebaseConfig";
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import "./HabitView.css";
 
 interface Habit {
@@ -36,7 +36,7 @@ const HabitView: React.FC = () => {
             console.error("Error al obtener el hábito:", error);
         }
     }, [id]);
-    
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (!user) {
@@ -63,16 +63,29 @@ const HabitView: React.FC = () => {
 
     const markAsCompleted = async () => {
         if (!userId || !id || !habit) return;
+
         try {
+            console.log("Marcando hábito como completado y eliminándolo...");
+
             const habitRef = doc(db, "users", userId, "habits", id);
-            await updateDoc(habitRef, { completed: true });
-            setHabit(prevHabit => prevHabit ? { ...prevHabit, completed: true } : prevHabit);
+            const habitSnap = await getDoc(habitRef);
 
-            console.log("Hábito marcado como completado. Redirigiendo a StreakView..."); // Depuración
+            if (habitSnap.exists()) {
+                // Marcar el hábito como completado
+                await updateDoc(habitRef, { completed: true });
+                console.log("Hábito marcado como completado");
 
-            history.replace("/Streakview");
+                // Eliminar el hábito
+                await deleteDoc(habitRef);
+                console.log("Hábito eliminado correctamente");
+
+                // Redirigir a la vista de Dashboard con un estado para forzar la recarga
+                history.replace("/Streakview");
+            } else {
+                console.error("Hábito no encontrado en la base de datos");
+            }
         } catch (error) {
-            console.error("Error al marcar el hábito como completado:", error);
+            console.error("Error al marcar o eliminar el hábito:", error);
         }
     };
 
